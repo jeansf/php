@@ -90,6 +90,11 @@ RUN docker-php-ext-install sockets
 RUN apt-get install -y librabbitmq-dev
 RUN pecl install amqp && docker-php-ext-enable amqp
 
+# Install configure PHP json, iconv, ctype
+RUN docker-php-ext-install json
+RUN docker-php-ext-install iconv
+RUN docker-php-ext-install ctype
+
 # Install Supervisor
 RUN apt-get install -y supervisor
 
