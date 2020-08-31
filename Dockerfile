@@ -1,5 +1,5 @@
-FROM php:apache-buster
-MAINTAINER Jean Soares Fernandes <3454862+jeansf@users.noreply.github.com>
+FROM php:7.4-apache-buster
+LABEL maintainer="Jean Soares Fernandes <jean.fernandes@pix.com.br>"
 
 # Setup timezone
 ENV TZ=America/Sao_Paulo
@@ -18,6 +18,9 @@ RUN a2enmod headers
 
 # Enable "mod_expires" – http://httpd.apache.org/docs/current/mod/mod_expires.html
 RUN a2enmod expires
+
+# Remove default config apache2
+RUN a2dissite 000-default
 
 # Install "Git" – https://git-scm.com/
 RUN apt-get install -y git
@@ -75,8 +78,8 @@ RUN docker-php-ext-install zip
 
 # Install configure PHP curl ssl
 RUN apt-get install -y ca-certificates
-RUN curl --remote-name --time-cond cacert.pem https://curl.haxx.se/ca/cacert.pem && cp cacert.pem /etc/ssl/certs/cacert.pem && \
-    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
+RUN curl --remote-name --time-cond cacert.pem https://curl.haxx.se/ca/cacert.pem && mv cacert.pem /etc/ssl/certs/cacert.pem && \
+    mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     sed -i 's/^.*curl.cainfo.*$/curl.cainfo = \"\/etc\/ssl\/certs\/cacert.pem\"/' /usr/local/etc/php/php.ini && \
     sed -i "s/upload_max_filesize = .*/upload_max_filesize = 256M/" /usr/local/etc/php/php.ini && \
     sed -i "s/post_max_size = .*/post_max_size = 256M/" /usr/local/etc/php/php.ini && \
@@ -95,13 +98,12 @@ RUN docker-php-ext-install json
 RUN docker-php-ext-install iconv
 RUN docker-php-ext-install ctype
 
-# Install Supervisor
-RUN apt-get install -y supervisor
-
-# Install Cron
-RUN apt-get install -y cron
-
 # Cleanup the image
 RUN rm -rf /var/lib/apt/lists/* /tmp/*
 
-CMD ["/usr/bin/supervisord"]
+# Create default with wildcard servername
+COPY configs/symfony.conf /etc/apache2/sites-available/symfony.conf
+RUN a2ensite symfony
+
+# Remove warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
