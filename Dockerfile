@@ -1,5 +1,5 @@
 FROM php:7.4-apache-buster
-LABEL maintainer="Jean Soares Fernandes <jean.fernandes@pix.com.br>"
+LABEL maintainer="Jean Soares Fernandes <3454862+jeansf@users.noreply.github.com>"
 
 # Setup timezone
 ENV TZ=America/Sao_Paulo
