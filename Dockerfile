@@ -99,7 +99,7 @@ RUN docker-php-ext-install iconv
 RUN docker-php-ext-install ctype
 
 # Install configure PHP calendar
-RUN docker-php-ext-install ctype
+RUN docker-php-ext-install calendar
 
 # Cleanup the image
 RUN rm -rf /var/lib/apt/lists/* /tmp/*
